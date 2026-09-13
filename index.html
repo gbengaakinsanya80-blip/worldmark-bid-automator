@@ -1,0 +1,2095 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Worldmark Bid Package Automator</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background: #f3f6f9;
+    color: #17202a;
+}
+
+.header {
+    background: #0b5d3b;
+    color: white;
+    padding: 25px;
+    text-align: center;
+}
+
+.header h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+.header p {
+    font-size: 14px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 35px auto;
+    padding: 20px;
+}
+
+.card {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 5px 20px rgba(0,0,0,.08);
+}
+
+h2 {
+    color: #0b5d3b;
+    margin-bottom: 10px;
+}
+
+.description {
+    color: #666;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.upload-area {
+    border: 2px dashed #0b5d3b;
+    border-radius: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    background: #f8fffb;
+}
+
+.upload-icon {
+    font-size: 50px;
+    margin-bottom: 15px;
+}
+
+.upload-area h3 {
+    margin-bottom: 10px;
+}
+
+.upload-area p {
+    color: #777;
+    margin-bottom: 20px;
+}
+
+.choose-btn {
+    display: inline-block;
+    background: #0b5d3b;
+    color: white;
+    padding: 14px 25px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#fileInput {
+    display: none;
+}
+
+.file-info {
+    display: none;
+    margin-top: 20px;
+    padding: 15px;
+    background: #eef8f2;
+    border-left: 5px solid #0b5d3b;
+    border-radius: 8px;
+}
+
+.analyse-btn {
+    display: none;
+    width: 100%;
+    margin-top: 20px;
+    padding: 16px;
+    border: none;
+    border-radius: 8px;
+    background: #f39c12;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.analyse-btn:disabled {
+    background: #999;
+}
+
+.loading {
+    display: none;
+    margin-top: 20px;
+    padding: 15px;
+    background: #fff4d6;
+    color: #765600;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.text-section {
+    display: none;
+    margin-top: 25px;
+}
+
+#extractedText {
+    width: 100%;
+    height: 350px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    line-height: 1.5;
+}
+
+.report-card {
+    display: none;
+}
+
+.report-header {
+    background: #0b5d3b;
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.report-header h2 {
+    color: white;
+}
+
+.report-header p {
+    margin-top: 5px;
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.summary-box {
+    background: #f5f7f8;
+    padding: 18px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.summary-number {
+    font-size: 28px;
+    font-weight: bold;
+    color: #0b5d3b;
+    margin-bottom: 8px;
+}
+
+.summary-box strong {
+    display: block;
+    margin-top: 8px;
+    color: #333;
+}
+
+.section-title {
+    background: #eef8f2;
+    color: #0b5d3b;
+    padding: 13px;
+    border-radius: 8px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.requirement {
+    padding: 14px;
+    margin-bottom: 8px;
+    border-radius: 7px;
+    border-left: 5px solid;
+    line-height: 1.5;
+}
+
+.found {
+    background: #eaf8ef;
+    border-color: #0b5d3b;
+}
+
+.not-found {
+    background: #f4f4f4;
+    border-color: #999;
+    color: #666;
+}
+
+.checklist-btn {
+    display: block;
+    width: 100%;
+    margin-top: 25px;
+    padding: 16px;
+    border: none;
+    border-radius: 8px;
+    background: #0b5d3b;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.checklist {
+    display: none;
+}
+
+.check-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    margin-bottom: 8px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    transition: .2s;
+}
+
+.check-item input {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.check-item.ready {
+    background: #eaf8ef;
+    border-color: #0b5d3b;
+}
+
+.category {
+    margin-bottom: 25px;
+}
+
+.readiness {
+    text-align: center;
+    background: #eef8f2;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+}
+
+.readiness-number {
+    font-size: 42px;
+    font-weight: bold;
+    color: #0b5d3b;
+    margin-top: 5px;
+}
+
+.progress {
+    width: 100%;
+    height: 18px;
+    background: #ddd;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 15px;
+}
+
+.progress-bar {
+    width: 0%;
+    height: 100%;
+    background: #0b5d3b;
+    transition: .3s;
+}
+
+.ai-extra {
+    margin-top: 20px;
+}
+
+.ai-summary {
+    background: #f8fffb;
+    border-left: 5px solid #0b5d3b;
+    padding: 18px;
+    border-radius: 8px;
+    line-height: 1.6;
+}
+
+.ai-list {
+    padding: 0;
+    margin: 0;
+}
+
+.ai-list li {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.suitability {
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.suitable {
+    background: #eaf8ef;
+    color: #0b5d3b;
+}
+
+.not-suitable {
+    background: #fff0f0;
+    color: #a33;
+}
+
+.footer {
+    text-align: center;
+    color: #777;
+    font-size: 13px;
+    padding: 20px;
+}
+
+@media(max-width:700px) {
+
+    .container {
+        padding: 10px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .summary {
+        grid-template-columns: 1fr;
+    }
+
+    .header h1 {
+        font-size: 22px;
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="header">
+
+    <h1>
+        📄 Worldmark Bid Package Automator
+    </h1>
+
+    <p>
+        Insurance Tender Analysis & Bid Packaging System
+    </p>
+
+</div>
+
+
+
+<div class="container">
+
+
+<!-- ================================================= -->
+<!-- TENDER UPLOAD -->
+<!-- ================================================= -->
+
+<div class="card">
+
+    <h2>
+        📄 Tender Analyser
+    </h2>
+
+    <p class="description">
+        Upload a tender PDF and automatically extract
+        important requirements for Worldmark's bid team.
+    </p>
+
+
+    <div class="upload-area">
+
+        <div class="upload-icon">
+            📁
+        </div>
+
+        <h3>
+            Upload Your Tender
+        </h3>
+
+        <p>
+            Select the tender PDF you want to analyse.
+        </p>
+
+        <label
+            for="fileInput"
+            class="choose-btn"
+        >
+            📁 CHOOSE TENDER
+        </label>
+
+        <input
+            type="file"
+            id="fileInput"
+            accept=".pdf,application/pdf"
+        >
+
+    </div>
+
+
+    <div
+        class="file-info"
+        id="fileInfo"
+    >
+
+        📄 <strong>Selected Tender:</strong>
+
+        <span id="fileName"></span>
+
+    </div>
+
+
+    <button
+        class="analyse-btn"
+        id="analyseBtn"
+        onclick="analyseTender()"
+    >
+
+        🔍 ANALYSE TENDER
+
+    </button>
+
+
+    <div
+        class="loading"
+        id="loading"
+    >
+
+        ⏳ Reading tender PDF...
+
+    </div>
+
+
+    <div
+        class="text-section"
+        id="textSection"
+    >
+
+        <h3 style="margin-bottom:10px;">
+            📄 Extracted Tender Text
+        </h3>
+
+        <textarea
+            id="extractedText"
+            readonly
+        ></textarea>
+
+    </div>
+
+</div>
+
+
+
+<!-- ================================================= -->
+<!-- REAL AI ANALYSIS -->
+<!-- ================================================= -->
+
+<div
+    class="card"
+    id="aiAnalysisCard"
+    style="display:none;"
+>
+
+    <div class="report-header">
+
+        <h2>
+            🤖 AI Tender Analysis
+        </h2>
+
+        <p>
+            Real AI analysis of the uploaded tender.
+        </p>
+
+    </div>
+
+
+    <div class="summary">
+
+        <div class="summary-box">
+
+            <div class="summary-number">
+                🏢
+            </div>
+
+            <div>
+                Client / Organisation
+            </div>
+
+            <strong id="aiClient">
+                Not yet analysed
+            </strong>
+
+        </div>
+
+
+        <div class="summary-box">
+
+            <div class="summary-number">
+                📄
+            </div>
+
+            <div>
+                Tender
+            </div>
+
+            <strong id="aiTenderTitle">
+                Not yet analysed
+            </strong>
+
+        </div>
+
+
+        <div class="summary-box">
+
+            <div class="summary-number">
+                📅
+            </div>
+
+            <div>
+                Deadline
+            </div>
+
+            <strong id="aiDeadline">
+                Not yet identified
+            </strong>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="section-title">
+        📦 LOTS / SERVICES
+    </div>
+
+    <div
+        class="requirement found"
+        id="aiLots"
+    >
+        Tender lots and services will appear here.
+    </div>
+
+
+
+    <div class="section-title">
+        🛡️ INSURANCE REQUIREMENTS
+    </div>
+
+    <div
+        class="requirement found"
+        id="aiInsurance"
+    >
+        Insurance-specific requirements will appear here.
+    </div>
+
+
+
+    <div class="section-title">
+        📋 MANDATORY DOCUMENTS
+    </div>
+
+    <div
+        class="requirement found"
+        id="aiDocuments"
+    >
+        Mandatory documents will appear here.
+    </div>
+
+
+
+    <div class="section-title">
+        📬 SUBMISSION INSTRUCTIONS
+    </div>
+
+    <div
+        class="requirement found"
+        id="aiSubmission"
+    >
+        Submission instructions will appear here.
+    </div>
+
+
+
+    <div class="section-title">
+        ⚠️ IMPORTANT WARNINGS
+    </div>
+
+    <div
+        class="requirement not-found"
+        id="aiWarnings"
+    >
+        Important warnings will appear here.
+    </div>
+
+
+    <!-- EXTRA AI INFORMATION -->
+
+    <div class="ai-extra">
+
+        <div class="section-title">
+            🎯 WORLDMark SUITABILITY
+        </div>
+
+        <div
+            id="aiSuitability"
+            class="suitability"
+        >
+            Awaiting AI analysis...
+        </div>
+
+
+        <div class="section-title">
+            📝 EXECUTIVE SUMMARY
+        </div>
+
+        <div
+            id="aiSummary"
+            class="ai-summary"
+        >
+            Awaiting AI analysis...
+        </div>
+
+
+        <div class="section-title">
+            ❓ CLARIFICATION QUESTIONS
+        </div>
+
+        <div
+            class="requirement"
+            id="aiQuestions"
+        >
+            No questions identified yet.
+        </div>
+
+
+        <div class="section-title">
+            📊 EVALUATION CRITERIA
+        </div>
+
+        <div
+            class="requirement"
+            id="aiEvaluation"
+        >
+            Evaluation criteria will appear here.
+        </div>
+
+
+        <div class="section-title">
+            💰 FINANCIAL REQUIREMENTS
+        </div>
+
+        <div
+            class="requirement"
+            id="aiFinancial"
+        >
+            Financial requirements will appear here.
+        </div>
+
+
+        <div class="section-title">
+            🏢 ELIGIBILITY REQUIREMENTS
+        </div>
+
+        <div
+            class="requirement"
+            id="aiEligibility"
+        >
+            Eligibility requirements will appear here.
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- ================================================= -->
+<!-- TENDER REPORT -->
+<!-- ================================================= -->
+
+<div
+    class="card report-card"
+    id="reportCard"
+>
+
+    <div class="report-header">
+
+        <h2>
+            📊 Preliminary Tender Screening
+        </h2>
+
+        <p>
+            Keyword-based screening for quick reference.
+        </p>
+
+    </div>
+
+
+    <div
+        class="summary"
+        id="summary"
+    ></div>
+
+
+    <div class="section-title">
+        🏢 GENERAL ELIGIBILITY
+    </div>
+
+    <div id="generalRequirements"></div>
+
+
+    <div class="section-title">
+        🛡️ INSURANCE REQUIREMENTS
+    </div>
+
+    <div id="insuranceRequirements"></div>
+
+
+    <div class="section-title">
+        📑 BID & SUBMISSION
+    </div>
+
+    <div id="submissionRequirements"></div>
+
+
+    <div class="section-title">
+        📋 OTHER REQUIREMENTS
+    </div>
+
+    <div id="otherRequirements"></div>
+
+
+    <button
+        class="checklist-btn"
+        onclick="showChecklist()"
+    >
+        📋 VIEW BID CHECKLIST
+    </button>
+
+</div>
+
+
+
+<!-- ================================================= -->
+<!-- CHECKLIST -->
+<!-- ================================================= -->
+
+<div
+    class="card checklist"
+    id="checklist"
+>
+
+    <div class="report-header">
+
+        <h2>
+            📋 Worldmark Bid Checklist
+        </h2>
+
+        <p>
+            Mark each item when it is ready.
+        </p>
+
+    </div>
+
+
+    <div class="readiness">
+
+        <div>
+            BID READINESS
+        </div>
+
+        <div
+            class="readiness-number"
+            id="readinessNumber"
+        >
+            0%
+        </div>
+
+        <div class="progress">
+
+            <div
+                class="progress-bar"
+                id="progressBar"
+            ></div>
+
+        </div>
+
+        <p
+            id="readinessText"
+            style="margin-top:12px;"
+        >
+            No documents marked ready yet.
+        </p>
+
+    </div>
+
+
+    <div class="category">
+
+        <div class="section-title">
+            🛡️ INSURANCE
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>NAICOM Registration / Evidence</span>
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>Insurance Experience</span>
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>Professional Insurance Registration</span>
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>Evidence of Insurance-Related Work</span>
+        </div>
+
+    </div>
+
+
+
+    <div class="category">
+
+        <div class="section-title">
+            🏢 COMPANY & COMPLIANCE
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>CAC Registration Documents</span>
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>Tax Clearance Certificate</span>
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>Pension / PENCOM Clearance</span>
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>ITF Certificate</span>
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>NSITF Clearance</span>
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>Company Profile</span>
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>Relevant Experience Documents</span>
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>Financial Capacity Evidence</span>
+        </div>
+
+    </div>
+
+
+
+    <div class="category">
+
+        <div class="section-title">
+            📑 BID DOCUMENTS
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>Technical Bid</span>
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>Financial Bid</span>
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>Required Number of Copies</span>
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>Bid Packaging / Envelope Requirements</span>
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>Submission Address Confirmed</span>
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>Closing Date Confirmed</span>
+        </div>
+
+
+        <div class="check-item">
+            <input type="checkbox" onchange="updateReadiness()">
+            <span>Opening Date Confirmed</span>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<div class="footer">
+
+    Worldmark Insurance Brokers Ltd.
+    —
+    Bid Automation System
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+/* ================================================= */
+/* PDF.JS */
+/* ================================================= */
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+"https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+
+/* ================================================= */
+/* ELEMENTS */
+/* ================================================= */
+
+const fileInput =
+document.getElementById("fileInput");
+
+const fileInfo =
+document.getElementById("fileInfo");
+
+const fileName =
+document.getElementById("fileName");
+
+const analyseBtn =
+document.getElementById("analyseBtn");
+
+const loading =
+document.getElementById("loading");
+
+const textSection =
+document.getElementById("textSection");
+
+const extractedText =
+document.getElementById("extractedText");
+
+const reportCard =
+document.getElementById("reportCard");
+
+
+/* ================================================= */
+/* FILE SELECTION */
+/* ================================================= */
+
+fileInput.addEventListener(
+"change",
+function() {
+
+    const file = this.files[0];
+
+    if (!file) return;
+
+
+    if (
+        file.type !== "application/pdf" &&
+        !file.name.toLowerCase().endsWith(".pdf")
+    ) {
+
+        alert("Please select a PDF tender document.");
+
+        this.value = "";
+
+        return;
+    }
+
+
+    fileName.textContent = file.name;
+
+    fileInfo.style.display = "block";
+
+    analyseBtn.style.display = "block";
+
+    textSection.style.display = "none";
+
+    reportCard.style.display = "none";
+
+    document.getElementById(
+        "aiAnalysisCard"
+    ).style.display = "none";
+
+    document.getElementById(
+        "checklist"
+    ).style.display = "none";
+
+});
+
+
+/* ================================================= */
+/* MAIN ANALYSIS */
+/* ================================================= */
+
+async function analyseTender() {
+
+    const file = fileInput.files[0];
+
+    if (!file) {
+
+        alert("Please choose a tender PDF first.");
+
+        return;
+    }
+
+
+    try {
+
+        loading.style.display = "block";
+
+        textSection.style.display = "none";
+
+        reportCard.style.display = "none";
+
+        document.getElementById(
+            "aiAnalysisCard"
+        ).style.display = "none";
+
+        analyseBtn.disabled = true;
+
+        analyseBtn.textContent =
+        "⏳ READING PDF...";
+
+
+        /* ----------------------------------------- */
+        /* READ PDF */
+        /* ----------------------------------------- */
+
+        const arrayBuffer =
+        await file.arrayBuffer();
+
+
+        const pdf =
+        await pdfjsLib.getDocument({
+            data: arrayBuffer
+        }).promise;
+
+
+        let fullText = "";
+
+
+        for (
+            let pageNumber = 1;
+            pageNumber <= pdf.numPages;
+            pageNumber++
+        ) {
+
+            const page =
+            await pdf.getPage(pageNumber);
+
+            const textContent =
+            await page.getTextContent();
+
+            let pageText = "";
+
+
+            textContent.items.forEach(
+            function(item) {
+
+                pageText += item.str + " ";
+
+            });
+
+
+            fullText +=
+            "\n\n===== PAGE " +
+            pageNumber +
+            " =====\n\n";
+
+            fullText += pageText;
+
+        }
+
+
+        extractedText.value =
+        fullText.trim();
+
+        textSection.style.display =
+        "block";
+
+
+        /* ----------------------------------------- */
+        /* LOCAL PRELIMINARY REPORT */
+        /* ----------------------------------------- */
+
+        createTenderReport(fullText);
+
+
+        /* ----------------------------------------- */
+        /* SEND TO REAL AI */
+        /* ----------------------------------------- */
+
+        loading.textContent =
+        "🤖 Sending tender to AI for detailed analysis...";
+
+
+        analyseBtn.textContent =
+        "🤖 AI ANALYSING...";
+
+
+        const aiResponse =
+        await fetch(
+            "/api/analyse-tender",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    tenderText: fullText
+                })
+            }
+        );
+
+
+        const result =
+        await aiResponse.json();
+
+
+        if (!aiResponse.ok || !result.success) {
+
+            console.error(
+                "AI ERROR:",
+                result
+            );
+
+            throw new Error(
+                result.error ||
+                "AI analysis failed."
+            );
+
+        }
+
+
+        /* ----------------------------------------- */
+        /* DISPLAY REAL AI RESULT */
+        /* ----------------------------------------- */
+
+        displayRealAIAnalysis(
+            result.analysis
+        );
+
+
+        loading.style.display =
+        "none";
+
+        analyseBtn.disabled =
+        false;
+
+        analyseBtn.textContent =
+        "🔍 ANALYSE TENDER";
+
+    }
+
+
+    catch(error) {
+
+        console.error(
+            "ANALYSIS ERROR:",
+            error
+        );
+
+
+        loading.style.display =
+        "none";
+
+        analyseBtn.disabled =
+        false;
+
+        analyseBtn.textContent =
+        "🔍 ANALYSE TENDER";
+
+
+        alert(
+            "AI analysis failed.\n\n" +
+            error.message +
+            "\n\nPlease check your Vercel/API setup."
+        );
+
+    }
+
+}
+
+
+/* ================================================= */
+/* DISPLAY REAL AI ANALYSIS */
+/* ================================================= */
+
+function displayRealAIAnalysis(analysis) {
+
+    const card =
+    document.getElementById(
+        "aiAnalysisCard"
+    );
+
+    card.style.display =
+    "block";
+
+
+    /* CLIENT */
+
+    document.getElementById(
+        "aiClient"
+    ).textContent =
+    analysis.client ||
+    "Not stated";
+
+
+    /* TITLE */
+
+    document.getElementById(
+        "aiTenderTitle"
+    ).textContent =
+    analysis.tender_title ||
+    "Not stated";
+
+
+    /* DEADLINE */
+
+    document.getElementById(
+        "aiDeadline"
+    ).textContent =
+    analysis.submission_deadline ||
+    "Not stated";
+
+
+    /* LOTS */
+
+    document.getElementById(
+        "aiLots"
+    ).innerHTML =
+    renderLots(
+        analysis.lots
+    );
+
+
+    /* INSURANCE */
+
+    document.getElementById(
+        "aiInsurance"
+    ).innerHTML =
+    renderList(
+        analysis.insurance_requirements,
+        "🛡️"
+    );
+
+
+    /* DOCUMENTS */
+
+    document.getElementById(
+        "aiDocuments"
+    ).innerHTML =
+    renderList(
+        analysis.mandatory_documents,
+        "📄"
+    );
+
+
+    /* SUBMISSION */
+
+    document.getElementById(
+        "aiSubmission"
+    ).innerHTML =
+    renderList(
+        analysis.submission_method,
+        "📬"
+    );
+
+
+    /* WARNINGS */
+
+    document.getElementById(
+        "aiWarnings"
+    ).innerHTML =
+    renderList(
+        analysis.important_warnings,
+        "⚠️"
+    );
+
+
+    /* SUITABILITY */
+
+    const suitability =
+    document.getElementById(
+        "aiSuitability"
+    );
+
+
+    if (
+        analysis.suitable_for_worldmark
+    ) {
+
+        suitability.className =
+        "suitability suitable";
+
+        suitability.innerHTML =
+        "✅ This tender appears suitable for Worldmark Insurance Brokers Ltd.";
+
+    }
+
+    else {
+
+        suitability.className =
+        "suitability not-suitable";
+
+        suitability.innerHTML =
+        "⚠️ This tender may not be suitable for Worldmark based on the supplied document.";
+
+    }
+
+
+    /* SUMMARY */
+
+    document.getElementById(
+        "aiSummary"
+    ).textContent =
+    analysis.executive_summary ||
+    "No executive summary returned.";
+
+
+    /* QUESTIONS */
+
+    document.getElementById(
+        "aiQuestions"
+    ).innerHTML =
+    renderList(
+        analysis.clarification_questions,
+        "❓"
+    );
+
+
+    /* EVALUATION */
+
+    document.getElementById(
+        "aiEvaluation"
+    ).innerHTML =
+    renderList(
+        analysis.evaluation_criteria,
+        "📊"
+    );
+
+
+    /* FINANCIAL */
+
+    document.getElementById(
+        "aiFinancial"
+    ).innerHTML =
+    renderList(
+        analysis.financial_requirements,
+        "💰"
+    );
+
+
+    /* ELIGIBILITY */
+
+    document.getElementById(
+        "aiEligibility"
+    ).innerHTML =
+    renderList(
+        analysis.eligibility_requirements,
+        "🏢"
+    );
+
+
+    card.scrollIntoView({
+        behavior: "smooth"
+    });
+
+}
+
+
+/* ================================================= */
+/* RENDER AI LIST */
+/* ================================================= */
+
+function renderList(items, icon) {
+
+    if (
+        !Array.isArray(items) ||
+        items.length === 0
+    ) {
+
+        return `
+            ${icon}
+            Not stated in supplied document.
+        `;
+
+    }
+
+
+    return `
+        <ul class="ai-list">
+            ${
+                items.map(
+                    item =>
+                    `<li>${icon} ${escapeHTML(item)}</li>`
+                ).join("")
+            }
+        </ul>
+    `;
+
+}
+
+
+/* ================================================= */
+/* RENDER LOTS */
+/* ================================================= */
+
+function renderLots(lots) {
+
+    if (
+        !Array.isArray(lots) ||
+        lots.length === 0
+    ) {
+
+        return "📦 Not stated in supplied document.";
+
+    }
+
+
+    return `
+        <ul class="ai-list">
+            ${
+                lots.map(
+                    lot =>
+                    `<li>📦 <strong>${escapeHTML(
+                        lot.lot_number
+                    )}</strong> — ${
+                        escapeHTML(
+                            lot.description
+                        )
+                    }</li>`
+                ).join("")
+            }
+        </ul>
+    `;
+
+}
+
+
+/* ================================================= */
+/* SECURITY */
+/* ================================================= */
+
+function escapeHTML(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* ================================================= */
+/* REQUIREMENT DATABASE */
+/* ================================================= */
+
+const requirements = {
+
+general: [
+
+    {
+        name:"CAC Registration",
+        keywords:[
+            "corporate affairs commission",
+            "cac"
+        ]
+    },
+
+    {
+        name:"Tax Clearance Certificate",
+        keywords:[
+            "tax clearance",
+            "tax clearance certificate"
+        ]
+    },
+
+    {
+        name:"Pension / PENCOM",
+        keywords:[
+            "pension clearance",
+            "pencom"
+        ]
+    },
+
+    {
+        name:"ITF Certificate",
+        keywords:[
+            "industrial training fund",
+            "itf"
+        ]
+    },
+
+    {
+        name:"NSITF Clearance",
+        keywords:[
+            "nsitf",
+            "social insurance trust fund"
+        ]
+    },
+
+    {
+        name:"Company Profile",
+        keywords:[
+            "company profile"
+        ]
+    },
+
+    {
+        name:"Relevant Experience",
+        keywords:[
+            "relevant experience",
+            "similar projects",
+            "previous experience"
+        ]
+    },
+
+    {
+        name:"Financial Capacity",
+        keywords:[
+            "financial capacity",
+            "financial capability",
+            "audited accounts"
+        ]
+    }
+
+],
+
+
+insurance:[
+
+    {
+        name:"NAICOM Registration",
+        keywords:[
+            "naicom",
+            "national insurance commission"
+        ]
+    },
+
+    {
+        name:"Insurance Experience",
+        keywords:[
+            "insurance experience",
+            "insurance services",
+            "insurance service"
+        ]
+    },
+
+    {
+        name:"Professional Insurance Registration",
+        keywords:[
+            "professional registration",
+            "professional body"
+        ]
+    },
+
+    {
+        name:"Insurance-Related Work",
+        keywords:[
+            "insurance-related",
+            "insurance related",
+            "insurance projects"
+        ]
+    }
+
+],
+
+
+submission:[
+
+    {
+        name:"Technical Bid",
+        keywords:[
+            "technical bid",
+            "technical proposal",
+            "technical submission"
+        ]
+    },
+
+    {
+        name:"Financial Bid",
+        keywords:[
+            "financial bid",
+            "financial proposal",
+            "financial submission"
+        ]
+    },
+
+    {
+        name:"Number of Copies",
+        keywords:[
+            "copies",
+            "copy of the technical",
+            "copies of the technical"
+        ]
+    },
+
+    {
+        name:"Packaging Instructions",
+        keywords:[
+            "sealed envelope",
+            "packaging",
+            "envelope"
+        ]
+    },
+
+    {
+        name:"Submission Location",
+        keywords:[
+            "submission address",
+            "submit",
+            "submission"
+        ]
+    },
+
+    {
+        name:"Closing Date",
+        keywords:[
+            "closing date",
+            "deadline",
+            "closing"
+        ]
+    },
+
+    {
+        name:"Opening Date",
+        keywords:[
+            "opening of bids",
+            "bid opening",
+            "opening"
+        ]
+    }
+
+],
+
+
+other:[
+
+    {
+        name:"Certificate of Incorporation",
+        keywords:[
+            "certificate of incorporation"
+        ]
+    },
+
+    {
+        name:"Reference Letter",
+        keywords:[
+            "reference letter",
+            "letter of reference"
+        ]
+    },
+
+    {
+        name:"Previous Contract Evidence",
+        keywords:[
+            "contract award",
+            "award letter"
+        ]
+    },
+
+    {
+        name:"Audited Financial Statements",
+        keywords:[
+            "audited financial statements",
+            "audited accounts"
+        ]
+    }
+
+]
+
+};
+
+
+/* ================================================= */
+/* CREATE PRELIMINARY TENDER REPORT */
+/* ================================================= */
+
+function createTenderReport(text) {
+
+    const tenderText =
+    text.toLowerCase();
+
+    let foundCount = 0;
+
+    let totalCount = 0;
+
+
+    function build(list, container) {
+
+        let html = "";
+
+
+        list.forEach(
+        function(item) {
+
+            totalCount++;
+
+            let found = false;
+
+
+            item.keywords.forEach(
+            function(keyword) {
+
+                if (
+                    tenderText.includes(keyword)
+                ) {
+
+                    found = true;
+
+                }
+
+            });
+
+
+            if (found) {
+
+                foundCount++;
+
+                html += `
+
+                <div class="requirement found">
+
+                    ✅ <strong>
+                    ${item.name}
+                    </strong>
+
+                    <br>
+
+                    <small>
+                    Detected in tender
+                    </small>
+
+                </div>
+
+                `;
+
+            }
+
+            else {
+
+                html += `
+
+                <div class="requirement not-found">
+
+                    ⚪ <strong>
+                    ${item.name}
+                    </strong>
+
+                    <br>
+
+                    <small>
+                    Not detected
+                    </small>
+
+                </div>
+
+                `;
+
+            }
+
+        });
+
+
+        container.innerHTML =
+        html;
+
+    }
+
+
+    build(
+        requirements.general,
+        document.getElementById(
+            "generalRequirements"
+        )
+    );
+
+
+    build(
+        requirements.insurance,
+        document.getElementById(
+            "insuranceRequirements"
+        )
+    );
+
+
+    build(
+        requirements.submission,
+        document.getElementById(
+            "submissionRequirements"
+        )
+    );
+
+
+    build(
+        requirements.other,
+        document.getElementById(
+            "otherRequirements"
+        )
+    );
+
+
+    const percentage =
+    Math.round(
+        (foundCount / totalCount) * 100
+    );
+
+
+    document.getElementById(
+        "summary"
+    ).innerHTML = `
+
+        <div class="summary-box">
+
+            <div class="summary-number">
+                ${foundCount}
+            </div>
+
+            <div>
+                Requirements Detected
+            </div>
+
+        </div>
+
+
+        <div class="summary-box">
+
+            <div class="summary-number">
+                ${totalCount}
+            </div>
+
+            <div>
+                Items Checked
+            </div>
+
+        </div>
+
+
+        <div class="summary-box">
+
+            <div class="summary-number">
+                ${percentage}%
+            </div>
+
+            <div>
+                Detection Rate
+            </div>
+
+        </div>
+
+    `;
+
+
+    reportCard.style.display =
+    "block";
+
+}
+
+
+/* ================================================= */
+/* SHOW CHECKLIST */
+/* ================================================= */
+
+function showChecklist() {
+
+    const checklist =
+    document.getElementById(
+        "checklist"
+    );
+
+    checklist.style.display =
+    "block";
+
+    checklist.scrollIntoView({
+        behavior:"smooth"
+    });
+
+    updateReadiness();
+
+}
+
+
+/* ================================================= */
+/* UPDATE READINESS */
+/* ================================================= */
+
+function updateReadiness() {
+
+    const checkboxes =
+    document.querySelectorAll(
+        "#checklist input[type='checkbox']"
+    );
+
+    let ready = 0;
+
+
+    checkboxes.forEach(
+    function(box) {
+
+        const item =
+        box.closest(
+            ".check-item"
+        );
+
+
+        if (box.checked) {
+
+            ready++;
+
+            item.classList.add(
+                "ready"
+            );
+
+        }
+
+        else {
+
+            item.classList.remove(
+                "ready"
+            );
+
+        }
+
+    });
+
+
+    const total =
+    checkboxes.length;
+
+
+    const percentage =
+    total === 0
+    ? 0
+    : Math.round(
+        (ready / total) * 100
+    );
+
+
+    document.getElementById(
+        "readinessNumber"
+    ).textContent =
+    percentage + "%";
+
+
+    document.getElementById(
+        "progressBar"
+    ).style.width =
+    percentage + "%";
+
+
+    if (percentage === 0) {
+
+        document.getElementById(
+            "readinessText"
+        ).textContent =
+        "No documents marked ready yet.";
+
+    }
+
+    else if (percentage < 50) {
+
+        document.getElementById(
+            "readinessText"
+        ).textContent =
+        "Bid preparation has started.";
+
+    }
+
+    else if (percentage < 100) {
+
+        document.getElementById(
+            "readinessText"
+        ).textContent =
+        "Good progress. Some requirements are still outstanding.";
+
+    }
+
+    else {
+
+        document.getElementById(
+            "readinessText"
+        ).textContent =
+        "🎉 All checklist items marked ready.";
+
+    }
+
+}
+
+</script>
+
+</body>
+
+</html>
